@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: survey-app
+    env: node
+    plan: free
+    region: oregon
+    buildCommand: "npm install"
+    startCommand: "node server.js"
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGO_URI
+        sync: false
+      - key: REVEAL_TIME
+        value: 2025-10-21T08:00:00-06:00

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Encuesta Nominated Admins</title>
+    <link rel="stylesheet" href="/style.css" />
+</head>
+
+<body>
+    <div class="container">
+        <h1>Encuesta: Nominated Admins</h1>
+
+        <% if (!voted && candidates) { %>
+            <form action="/vote" method="POST">
+                <% candidates.forEach(name=> { %>
+                    <button type="submit" name="candidate" value="<%= name %>">
+                        <%= name %>
+                    </button>
+                    <% }) %>
+            </form>
+            <% } else { %>
+                <h2>Gracias por votar 🗳️</h2>
+                <p>Los resultados se mostrarán el <strong>21/10/2025 a las 8:00 a.m.</strong></p>
+                <% } %>
+    </div>
+</body>
+
+</html>
