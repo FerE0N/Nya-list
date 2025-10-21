@@ -23,6 +23,15 @@ document.addEventListener("DOMContentLoaded", () => {
         // 1. Prevenimos que el formulario se envíe de la forma tradicional
         event.preventDefault();
 
+        // Deshabilitar todos los botones para evitar múltiples clics
+        const buttons = voteForm.querySelectorAll('button');
+        buttons.forEach(button => {
+            button.disabled = true;
+            button.style.opacity = '0.7';
+            button.style.cursor = 'not-allowed';
+        });
+
+
         // 2. Obtenemos los datos del botón en el que se hizo clic
         const candidateName = event.target.value;
         const formAction = voteForm.action; // La URL (/vote)
@@ -40,7 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 body: JSON.stringify({ candidate: candidateName }),
             });
 
-            // 4. Si el servidor responde "OK" (ej. 200)
+            // 4. Si el servidor responde "OK" (ej. 200 o 201)
             if (response.ok) {
                 // Ocultamos el formulario
                 voteForm.style.display = "none";
@@ -48,11 +57,21 @@ document.addEventListener("DOMContentLoaded", () => {
                 // Mostramos el mensaje de agradecimiento
                 thankYouMessage.style.display = "block";
             } else {
-                // Si algo salió mal en el servidor
+                // Si algo salió mal en el servidor, re-habilitamos los botones
+                buttons.forEach(button => {
+                    button.disabled = false;
+                    button.style.opacity = '1';
+                    button.style.cursor = 'pointer';
+                });
                 alert("Error al enviar el voto. Inténtalo de nuevo.");
             }
         } catch (error) {
-            // Si hay un error de red (ej. sin conexión)
+            // Si hay un error de red (ej. sin conexión), re-habilitamos los botones
+            buttons.forEach(button => {
+                button.disabled = false;
+                button.style.opacity = '1';
+                button.style.cursor = 'pointer';
+            });
             console.error("Error de red:", error);
             alert("Error de conexión. No se pudo enviar el voto.");
         }

@@ -10,24 +10,35 @@
 
 <body>
     <div class="container">
-        <h1>Resultados 🏆</h1>
+        <h1>Resultados Finales <span role="img" aria-label="trofeo">🏆</span></h1>
         <% if (results.length===0) { %>
-            <p>No hay votos aún.</p>
+            <p>Aún no hay votos registrados.</p>
             <% } else { %>
                 <ul class="results-list">
-                    <% results.forEach(r=> { %>
-                        <li>
-                            <strong>
-                                <%= r._id %>
-                            </strong>
-                            <span>
-                                <%= r.count %> votos
-                            </span>
+                    <% const totalVotes=results.reduce((sum, r)=> sum + r.count, 0);
+                        results.forEach(r => {
+                        %>
+                        <li class="results-item">
+                            <div class="candidate-info">
+                                <span class="candidate-name">
+                                    <%= r._id %>
+                                </span>
+                                <span class="vote-count" data-votes="<%= r.count %>">
+                                    <%= r.count %> votos
+                                </span>
+                            </div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar-fill" style="width: 0%;"
+                                    data-percentage="<%= (r.count / totalVotes * 100).toFixed(1) %>">
+                                </div>
+                            </div>
                         </li>
-                        <% }) %>
+                        <% }); %>
                 </ul>
                 <% } %>
     </div>
+
+    <script src="/script-results.js" defer></script>
 </body>
 
 </html>
