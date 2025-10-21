@@ -13,6 +13,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // --- Middlewares ---
+app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -62,19 +63,52 @@ app.get("/", async (req, res) => {
 });
 
 // --- Enviar voto ---
+// --- Enviar voto (VERSIÓN CORREGIDA) ---
 app.post("/vote", async (req, res) => {
-    const { candidate } = req.body;
-    const voterId = req.cookies.voterId;
+    try {
+        const { candidate } = req.body;
+        const voterId = req.cookies.voterId;
 
-    if (voterId) return res.redirect("/");
+        // 1. Revisa si el usuario ya votó
+        if (voterId) {
+            // Si la petición es JSON, manda un error JSON
+            if (req.is('json')) {
+                return res.status(403).json({ message: "Ya has votado." });
+            }
+            // Si es un formulario normal, redirige
+            return res.redirect("/");
+        }
 
-    if (!candidates.includes(candidate)) return res.status(400).send("Candidato inválido");
+        // 2. Revisa si el candidato es válido
+        if (!candidates.includes(candidate)) {
+            if (req.is('json')) {
+                return res.status(400).json({ message: "Candidato inválido." });
+            }
+            return res.status(400).send("Candidato inválido");
+        }
 
-    const uniqueId = Math.random().toString(36).substring(2, 15);
-    res.cookie("voterId", uniqueId, { maxAge: 1000 * 60 * 60 * 24 * 365 });
+        // 3. Si todo está bien, crea el voto
+        const uniqueId = Math.random().toString(36).substring(2, 15);
+        res.cookie("voterId", uniqueId, { maxAge: 1000 * 60 * 60 * 24 * 365 });
 
-    await Vote.create({ voterId: uniqueId, candidate });
-    res.redirect("/");
+        await Vote.create({ voterId: uniqueId, candidate });
+
+        // 4. Responde correctamente
+        if (req.is('json')) {
+            // ¡ÉXITO! Responde con JSON al script.js
+            return res.status(201).json({ success: true, message: "Voto registrado." });
+        }
+
+        // Éxito para formularios normales: redirige
+        res.redirect("/");
+
+    } catch (error) {
+        console.error("Error en /vote:", error);
+        if (req.is('json')) {
+            return res.status(500).json({ message: "Error interno del servidor." });
+        }
+        res.status(500).send("Error interno del servidor.");
+    }
 });
 
 // --- Servidor ---

@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Encuesta Nominated Admins</title>
     <link rel="stylesheet" href="/style.css" />
 </head>
@@ -11,19 +12,29 @@
     <div class="container">
         <h1>Encuesta: Nominated Admins</h1>
 
-        <% if (!voted && candidates) { %>
-            <form action="/vote" method="POST">
+        <% if (!voted) { %>
+            <form id="vote-form" action="/vote" method="POST">
                 <% candidates.forEach(name=> { %>
                     <button type="submit" name="candidate" value="<%= name %>">
                         <%= name %>
                     </button>
                     <% }) %>
             </form>
-            <% } else { %>
+
+            <div id="thank-you-message">
                 <h2>Gracias por votar 🗳️</h2>
                 <p>Los resultados se mostrarán el <strong>21/10/2025 a las 8:00 a.m.</strong></p>
+            </div>
+
+            <% } else { %>
+                <div>
+                    <h2>Gracias por votar 🗳️</h2>
+                    <p>Los resultados se mostrarán el <strong>21/10/2025 a las 8:00 a.m.</strong></p>
+                </div>
                 <% } %>
     </div>
+
+    <script src="/script.js" defer></script>
 </body>
 
 </html>
